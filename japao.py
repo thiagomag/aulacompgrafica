@@ -25,8 +25,7 @@ def display():
 
     gl.glPushMatrix()
     gl.glTranslate(0,0,0)
-    gl.glScalef(0.5,0.5,0.5)
-    gl.glRotatef(180,0,0,1)
+    gl.glScalef(0.4,0.5,0.4)
     gl.glColor3f(1,0,0)
     circulo(True)
     gl.glPopMatrix()
