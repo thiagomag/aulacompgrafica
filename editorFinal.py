@@ -5,6 +5,19 @@ import ctypes
 
 FONT = glut.GLUT_STROKE_ROMAN
 
+"""
+Como utilizar o programa:
+Para alterar a cor do pincel, pressione as teclas de F1 a F9.
+Para alterar a cor do preenchimento, pressione as teclas de 0 a 9 e -.
+Para alterar a ação, pressione as teclas P para ponto, L para linha, A para poligono abero e F para poligono fechado.
+Para limpar a tela, pressione a tecla E.
+Para sair do programa, pressione a tecla ESC.
+Para desenhar um ponto, clique com o botão esquerdo do mouse.
+Para desenhar uma linha, clique com o botão esquerdo do mouse para definir o primeiro ponto e arraste até o segundo ponto, soltando o botão esquerdo do mouse.
+Para desenhar um poligono aberto, clique com o botão esquerdo do mouse para definir os pontos e clique com o botão direito do mouse para finalizar.
+Para desenhar um poligono fechado, clique com o botão esquerdo do mouse para definir os pontos e clique com o botão direito do mouse para finalizar.
+"""
+
 class Ponto:
     def __init__(self, *arg, **kargs):
         self.cor = (1,1,1) if len(arg)<1 else arg[0]
