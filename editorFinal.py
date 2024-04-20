@@ -80,6 +80,9 @@ class Cena:
         for obj in self.objetos:
             obj.draw()
 
+    def erase(self):
+        self.objetos.clear()
+
 width = 100
 height = 100
 ajuste=1
@@ -216,14 +219,16 @@ def mouse(button,state,x,y):
     xm = (x-width/2.0)*ajuste
     ym = (height/2.0-y)*ajuste
     print(f"clicou {button}, {state}, x:{x}, y:{y}")
-    if (acao == "P"):
+    if acao == "P":
         cena.add(Ponto(pincel,xm,ym))
-    elif (acao == "L"):
+    elif acao == "L":
         if button == 0 and state == 0:
             xn = xm
             yn = ym
         elif button == 0 and state == 1:
             cena.add(Linha(pincel, xn, yn, xm, ym))
+    elif acao == "PA":
+        print(acao)
         
 
 def mouseMove(x,y):
@@ -265,6 +270,8 @@ def keyPress(key,x,y):
         acao = "PA"
     elif key == 102:
         acao = "PF"
+    elif key == 101:
+        cena.erase()
 
 def specialKeyPress(key,x,y):
     global pincel
