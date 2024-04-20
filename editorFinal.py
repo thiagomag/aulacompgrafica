@@ -1,6 +1,5 @@
 import OpenGL.GL as gl
 import OpenGL.GLUT as glut
-import math
 import os
 import ctypes
 
@@ -51,7 +50,7 @@ class Linha:
         gl.glVertex2f(self.x2, self.y2)
         gl.glEnd()
 
-class PoligonoAberto:
+class Poligono:
     def __init__(self, *args, **kwargs):
         self.cor = (1, 1, 1, 1) if len(args) < 1 else args[0]
         self.vertices = [(0, 0), (0, 0)] if len(args) < 5 else args[1:5]
@@ -61,10 +60,25 @@ class PoligonoAberto:
         if "vertices" in kwargs:
             self.vertices = kwargs["vertices"]
 
+    def drawOutline(self):
+        if self.cor == (1,1,1,0):
+            gl.glColor4f(1,1,1,1)
+        else:
+            gl.glColor4f(*self.cor)
+        gl.glLineWidth(1)
+        gl.glBegin(gl.GL_LINE_LOOP)
+        for vertex in self.vertices:
+            gl.glVertex2f(*vertex)
+        gl.glEnd()
+
     def draw(self):
-        gl.glColor3f(*self.cor)
+        if acao == "PA":
+            gl.glColor3f(*self.cor)
+        elif acao == "PF":
+            self.drawOutline()
+            gl.glColor4f(*self.cor)
         gl.glPointSize(3)
-        gl.glBegin(gl.GL_LINE_STRIP)
+        gl.glBegin(gl.GL_LINE_STRIP if acao == "PA" else gl.GL_POLYGON)
         for vertex in self.vertices:
             gl.glVertex2f(*vertex)
         gl.glEnd()
@@ -100,14 +114,6 @@ pincel = (1,1,1)
 preenchimento = (1,1,1,1)
 acao = "P"
 cena = Cena()
-
-def poligono(vertices:int, fill:bool=False):
-    gl.glBegin(gl.GL_POLYGON if fill else gl.GL_LINE_LOOP)
-    delta = 2*math.pi/vertices
-    for i in range(vertices):
-        ang = delta*i
-        gl.glVertex2f(math.cos(ang),math.sin(ang))
-    gl.glEnd()
     
 def drawFillRect():
     gl.glBegin(gl.GL_POLYGON)
@@ -227,13 +233,14 @@ def mouse(button,state,x,y):
             yn = ym
         elif button == 0 and state == 1:
             cena.add(Linha(pincel, xn, yn, xm, ym))
-    elif acao == "PA":
+    elif acao == "PA" or acao == "PF":
         if button == 0 and state == 0:
             vertices.append((xm, ym))
             cena.add(Ponto(pincel,xm,ym))
         elif button == 2 and state == 0:
             if len(vertices) >= 2:
-                cena.add(PoligonoAberto(pincel, vertices=vertices))
+                cena.add(Poligono(pincel, vertices=vertices) if acao == "PA" 
+                         else Poligono(preenchimento, vertices=vertices))
             vertices = []
         
 
@@ -308,10 +315,13 @@ def main():
     glut.glutInitWindowSize(500, 500)
     glut.glutCreateWindow(b'window')
 
+    gl.glEnable(gl.GL_BLEND)
+    gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+
     glut.glutDisplayFunc(display)
     glut.glutReshapeFunc(resize)
     glut.glutMouseFunc(mouse)
-    glut.glutPassiveMotionFunc( mouseMove ) 
+    glut.glutPassiveMotionFunc(mouseMove) 
     glut.glutKeyboardFunc(keyPress)
     glut.glutSpecialFunc(specialKeyPress)
     
