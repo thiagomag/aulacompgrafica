@@ -50,7 +50,7 @@ class Linha:
         gl.glVertex2f(self.x2, self.y2)
         gl.glEnd()
 
-class Poligono:
+class PoligonoFechado:
     def __init__(self, *args, **kwargs):
         self.cor = (1, 1, 1, 1) if len(args) < 1 else args[0]
         self.vertices = [(0, 0), (0, 0)] if len(args) < 5 else args[1:5]
@@ -72,13 +72,28 @@ class Poligono:
         gl.glEnd()
 
     def draw(self):
-        if acao == "PA":
-            gl.glColor3f(*self.cor)
-        elif acao == "PF":
-            self.drawOutline()
-            gl.glColor4f(*self.cor)
+        self.drawOutline()
+        gl.glColor4f(*self.cor)
         gl.glPointSize(3)
-        gl.glBegin(gl.GL_LINE_STRIP if acao == "PA" else gl.GL_POLYGON)
+        gl.glBegin(gl.GL_POLYGON)
+        for vertex in self.vertices:
+            gl.glVertex2f(*vertex)
+        gl.glEnd()
+
+class PoligonoAberto:
+    def __init__(self, *args, **kwargs):
+        self.cor = (1, 1, 1, 1) if len(args) < 1 else args[0]
+        self.vertices = [(0, 0), (0, 0)] if len(args) < 5 else args[1:5]
+        
+        if "color" in kwargs:
+            self.cor = kwargs["color"]
+        if "vertices" in kwargs:
+            self.vertices = kwargs["vertices"]
+
+    def draw(self):
+        gl.glColor3f(*self.cor)
+        gl.glPointSize(3)
+        gl.glBegin(gl.GL_LINE_STRIP)
         for vertex in self.vertices:
             gl.glVertex2f(*vertex)
         gl.glEnd()
@@ -93,6 +108,10 @@ class Cena:
     def draw(self):
         for obj in self.objetos:
             obj.draw()
+    
+    def eraseObjects(self, objects):
+        for obj in objects:
+            self.objetos.remove(obj)
 
     def erase(self):
         self.objetos.clear()
@@ -107,6 +126,7 @@ yn = 0
 xm = 0
 ym = 0
 vertices = []
+pontos_poligono = []
 
 glut.glutInit()
 
@@ -221,7 +241,7 @@ def resize(x,y):
         gl.glOrtho(-w,w,-1,1,-1,1)
 
 def mouse(button,state,x,y):
-    global xn, yn, vertices
+    global xn, yn, vertices, pontos_poligono
     xm = (x-width/2.0)*ajuste
     ym = (height/2.0-y)*ajuste
     print(f"clicou {button}, {state}, x:{x}, y:{y}")
@@ -236,12 +256,16 @@ def mouse(button,state,x,y):
     elif acao == "PA" or acao == "PF":
         if button == 0 and state == 0:
             vertices.append((xm, ym))
-            cena.add(Ponto(pincel,xm,ym))
+            ponto = Ponto((1,1,1), xm, ym)
+            pontos_poligono.append(ponto)
+            cena.add(ponto)
         elif button == 2 and state == 0:
             if len(vertices) >= 2:
-                cena.add(Poligono(pincel, vertices=vertices) if acao == "PA" 
-                         else Poligono(preenchimento, vertices=vertices))
+                cena.add(PoligonoAberto(pincel, vertices=vertices) if acao == "PA" 
+                         else PoligonoFechado(preenchimento, vertices=vertices))
+                cena.eraseObjects(pontos_poligono)
             vertices = []
+            pontos_poligono = []
         
 
 def mouseMove(x,y):
