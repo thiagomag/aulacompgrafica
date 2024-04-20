@@ -96,6 +96,7 @@ glut.glutInit()
 
 pincel = (1,1,1)
 preenchimento = (1,1,1,1)
+acao = "P"
 cena = Cena()
 
 def poligono(vertices:int, fill:bool=False):
@@ -135,10 +136,9 @@ def drawFinishText(texto):
 def display():
     gl.glPushMatrix()
 
-    gl.glClearColor(0, 0, 0, 0) # preto
+    gl.glClearColor(0, 0, 0, 0)
     gl.glClear(gl.GL_COLOR_BUFFER_BIT|gl.GL_DEPTH_BUFFER_BIT)
 
-    #mostra o pincel corrente
     gl.glPushMatrix()
     gl.glColor3f(1,1,1)
     gl.glTranslatef(-0.95,0.95,0)
@@ -153,19 +153,31 @@ def display():
     drawFillRect()
     gl.glPopMatrix()
 
-    #mostra o preenchimento corrente
     gl.glPushMatrix()
     gl.glColor3f(1,1,1)
-    gl.glTranslatef(-0.2,0.95,0)
+    gl.glTranslatef(-0.38,0.95,0)
     gl.glScalef(0.1,0.1,1)
     drawText("Preenchimento:")
     gl.glPopMatrix()
 
     gl.glPushMatrix()
-    gl.glTranslatef(0.55,0.95,0)
+    gl.glTranslatef(0.35,0.95,0)
     gl.glScalef(0.1,0.07,1)
     gl.glColor4f(*preenchimento)
     drawFillRect()
+    gl.glPopMatrix()
+
+    gl.glPushMatrix() 
+    gl.glColor3f(1,1,1)
+    gl.glTranslatef(0.55,0.95,0)
+    gl.glScalef(0.1,0.1,1)
+    drawText("Acao:")
+    gl.glPopMatrix()
+
+    gl.glPushMatrix()
+    gl.glTranslatef(0.8,0.95,0)
+    gl.glScalef(0.1,0.07,1)
+    drawText(texto="\"" + acao + "\"")
     gl.glPopMatrix()
 
     cena.draw()
@@ -200,47 +212,29 @@ def resize(x,y):
         ajuste = 2.0/height
         gl.glOrtho(-w,w,-1,1,-1,1)
 
-def init():
-    #https://www.inf.pucrs.br/~pinho/CG/Aulas/OpenGL/LuzesGL.html
-    gl.glShadeModel(gl.GL_SMOOTH)
-    gl.glMaterialfv(gl.GL_FRONT,gl.GL_SPECULAR, [1.0,1.0,1.0,1.0])
-    gl.glMateriali(gl.GL_FRONT,gl.GL_SHININESS,60)
-
-    gl.glLightModelfv(gl.GL_LIGHT_MODEL_AMBIENT, [0.2,0.2,0.2,1.0])
-
-
-    gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, [0.2,0.2,0.2,1.0])
-    gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, [0.7,0.7,0.7,1.0] )
-    gl.glLightfv(gl.GL_LIGHT0, gl.GL_SPECULAR, [1.0, 1.0, 1.0, 1.0] )
-    gl.glLightfv(gl.GL_LIGHT0, gl.GL_POSITION, [50.0, 50.0, 50.0, 1.0] )
-
-    gl.glEnable(gl.GL_COLOR_MATERIAL)
-    gl.glEnable(gl.GL_LIGHTING)
-    gl.glEnable(gl.GL_LIGHT0)
-    gl.glEnable(gl.GL_DEPTH_TEST)
-
 def mouse(button,state,x,y):
     #entra aqui quando clica algum botao do mouse
     global xn, yn
     xm = (x-width/2.0)*ajuste
     ym = (height/2.0-y)*ajuste
     print(f"clicou {button}, {state}, x:{x}, y:{y}")
-    if (button == 0 and state == 0):
-        xn = xm
-        yn = ym
+    if (acao == "P"):
         cena.add(Ponto(pincel,xm,ym))
-    elif (button == 0 and state == 1):
-        vertices.append((xm,ym))
-        cena.add(PoligonoAberto(pincel,vertices))
-    elif (button == 1 and state == 0):
-         vertices = []
+    elif (acao == "L"):
+        if button == 0 and state == 0:
+            xn = xm
+            yn = ym
+            cena.add(Ponto(pincel, xm, ym))
+        elif button == 0 and state == 1:
+            cena.add(Linha(pincel, xn, yn, xm, ym))
+        
 
 def mouseMove(x,y):
     #entra aqui quando move o mouse
     print(f" moveu x:{x}, y:{y}")
 
 def keyPress(key,x,y):
-    global preenchimento
+    global preenchimento, acao
     key = key[0]
     print(f"pressionou {key}, {x}, {y}")
     if key == 27:
@@ -267,7 +261,14 @@ def keyPress(key,x,y):
         preenchimento = (0.3,0,0.3,1)
     elif key == 45:
         preenchimento = (1,1,1,0)
-    
+    elif key == 112:
+        acao = "P"
+    elif key == 108:
+        acao = "L"
+    elif key == 97:
+        acao = "PA"
+    elif key == 102:
+        acao = "PF"
 
 def specialKeyPress(key,x,y):
     global pincel
@@ -305,7 +306,7 @@ def main():
     glut.glutPassiveMotionFunc( mouseMove ) 
     glut.glutKeyboardFunc(keyPress)
     glut.glutSpecialFunc(specialKeyPress)
-    #init()
+    
     glut.glutMainLoop()
 
 if __name__=='__main__':
