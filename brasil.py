@@ -1,9 +1,8 @@
+import random
 import OpenGL.GL as gl
 import OpenGL.GLUT as glut
-import OpenGL.GLU as glu
 import math
 import ctypes
-import sys
 
 glut.glutInit()
 
@@ -45,6 +44,15 @@ def estrela():
     gl.glVertex2f(-0.3, -0.5)
     gl.glEnd()
 
+def estrelas(posicoes):
+    for posicao in posicoes:
+        gl.glPushMatrix()
+        gl.glTranslate(posicao[0],posicao[1],0)
+        gl.glScale(0.05, 0.05, 0.05)
+        gl.glColor3f(1,1,1)
+        estrela()
+        gl.glPopMatrix()
+
 def display():
     gl.glClearColor(0, 0.5, 0, 0.5)
     gl.glClear(gl.GL_COLOR_BUFFER_BIT|gl.GL_DEPTH_BUFFER_BIT)
@@ -78,12 +86,14 @@ def display():
     texto("ORDEM E PROGRESSO")
     gl.glPopMatrix()
 
-    gl.glPushMatrix()
-    gl.glTranslate(-0.1,-0.3,0)
-    gl.glScale(0.05, 0.05, 0.05)
-    gl.glColor3f(1,1,1)
-    estrela()
-    gl.glPopMatrix()
+    star_positions = [
+    (0, 0.1), (0.3, -0.2), (-0.2, -0.3), (0.1, -0.35), (-0.3, -0.15), (0.25, -0.25),
+    (-0.1, -0.25), (0.35, -0.05), (-0.05, -0.35), (0.15, -0.3), (-0.35, -0.1),
+    (0.2, -0.2), (-0.15, -0.25), (0.05, -0.3), (-0.25, -0.15), (0.3, -0.1),
+    (-0.2, -0.2), (0.1, -0.15), (-0.3, -0.2), (0.25, -0.05), (-0.1, -0.3),
+    (0.35, -0.2), (-0.05, -0.25), (0.15, -0.2), (-0.35, -0.25), (0.2, -0.05),
+    (-0.15, -0.1)]
+    estrelas(star_positions)
     
     glut.glutSwapBuffers()
     glut.glutPostRedisplay()
