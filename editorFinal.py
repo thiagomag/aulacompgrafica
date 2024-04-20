@@ -1,9 +1,6 @@
 import OpenGL.GL as gl
 import OpenGL.GLUT as glut
-import OpenGL.GLU as glu
-import sys
 import math
-import random
 import os
 import ctypes
 
@@ -90,6 +87,8 @@ rect = (0,0,0,0)
 size = 0
 xn = 0
 yn = 0
+xm = 0
+ym = 0
 vertices = []
 
 glut.glutInit()
@@ -213,7 +212,6 @@ def resize(x,y):
         gl.glOrtho(-w,w,-1,1,-1,1)
 
 def mouse(button,state,x,y):
-    #entra aqui quando clica algum botao do mouse
     global xn, yn
     xm = (x-width/2.0)*ajuste
     ym = (height/2.0-y)*ajuste
@@ -224,13 +222,11 @@ def mouse(button,state,x,y):
         if button == 0 and state == 0:
             xn = xm
             yn = ym
-            cena.add(Ponto(pincel, xm, ym))
         elif button == 0 and state == 1:
             cena.add(Linha(pincel, xn, yn, xm, ym))
         
 
 def mouseMove(x,y):
-    #entra aqui quando move o mouse
     print(f" moveu x:{x}, y:{y}")
 
 def keyPress(key,x,y):
@@ -272,7 +268,6 @@ def keyPress(key,x,y):
 
 def specialKeyPress(key,x,y):
     global pincel
-    #entra aqui quando pressiona alguma tecla especial
     print(f"especial {key}, {x}, {y}")
     if key == 1:
         pincel = (1, 1, 1)
