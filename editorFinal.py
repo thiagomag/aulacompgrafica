@@ -62,7 +62,7 @@ class PoligonoAberto:
             self.vertices = kwargs["vertices"]
 
     def draw(self):
-        gl.glColor4f(*self.cor)
+        gl.glColor3f(*self.cor)
         gl.glPointSize(3)
         gl.glBegin(gl.GL_LINE_STRIP)
         for vertex in self.vertices:
@@ -215,7 +215,7 @@ def resize(x,y):
         gl.glOrtho(-w,w,-1,1,-1,1)
 
 def mouse(button,state,x,y):
-    global xn, yn
+    global xn, yn, vertices
     xm = (x-width/2.0)*ajuste
     ym = (height/2.0-y)*ajuste
     print(f"clicou {button}, {state}, x:{x}, y:{y}")
@@ -228,7 +228,13 @@ def mouse(button,state,x,y):
         elif button == 0 and state == 1:
             cena.add(Linha(pincel, xn, yn, xm, ym))
     elif acao == "PA":
-        print(acao)
+        if button == 0 and state == 0:
+            vertices.append((xm, ym))
+            cena.add(Ponto(pincel,xm,ym))
+        elif button == 2 and state == 0:
+            if len(vertices) >= 2:
+                cena.add(PoligonoAberto(pincel, vertices=vertices))
+            vertices = []
         
 
 def mouseMove(x,y):
